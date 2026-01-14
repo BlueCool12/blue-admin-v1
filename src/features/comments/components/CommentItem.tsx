@@ -216,7 +216,7 @@ export function CommentItem({ comment, onUpdateStatus, onDeleteClick, onReplySub
               variant="outlined"
               color="primary"
               icon={<OpenInNewRounded style={{ fontSize: 12 }} />}
-              onClick={() => window.open(`https://www.pyomin.com/posts/${comment.post.slug}`, '_blank')}
+              onClick={() => window.open(`https://pyomin.com/posts/${comment.post.slug}`, '_blank')}
               sx={{
                 cursor: 'pointer',
                 fontSize: '0.7rem',

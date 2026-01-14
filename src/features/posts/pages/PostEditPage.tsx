@@ -21,7 +21,7 @@ export interface PublishDataState {
   status: PostStatus;
 }
 
-const IFRAME_SITE_URL = 'https://www.pyomin.com';
+const IFRAME_SITE_URL = 'https://pyomin.com';
 
 export default function PostEditPage() {
 
@@ -167,7 +167,12 @@ export default function PostEditPage() {
 
         <Divider sx={{ my: 2 }} />
 
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ pb: 10 }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          spacing={2}
+        >
           <Button
             variant="contained"
             color="info"
@@ -178,11 +183,16 @@ export default function PostEditPage() {
             미리 보기
           </Button>
 
-          <Stack direction="row" spacing={2}>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
             <Button
               variant="outlined"
               color="primary"
               size="large"
+              fullWidth
               startIcon={<DriveFileRenameOutlineRounded />}
               onClick={handleDraftSave}
               disabled={isUpdating}
@@ -193,6 +203,7 @@ export default function PostEditPage() {
               variant="contained"
               disableElevation
               size="large"
+              fullWidth
               startIcon={<CheckCircleOutlineRounded />}
               onClick={() => setIsModalOpen(true)}
               disabled={isUpdating}
