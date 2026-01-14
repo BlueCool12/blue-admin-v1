@@ -49,7 +49,7 @@ export default function PostEditPage() {
         setPublishData({
           slug: post.publishInfo.slug || "",
           description: post.publishInfo.description || "",
-          categoryId: post.publishInfo.category.id || 0,
+          categoryId: post.publishInfo.category?.id || 0,
           status: post.publishInfo.status || PostStatus.DRAFT,
         })
       }
