@@ -9,7 +9,10 @@ export interface PostResponse {
   publishInfo: {
     slug: string;
     description: string;
-    categoryId: number;
+    category: {
+      id: number;
+      name: string;
+    };
     status: PostStatus;
     publishedAt: string;
   };

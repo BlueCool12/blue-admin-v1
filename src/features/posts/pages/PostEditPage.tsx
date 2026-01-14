@@ -1,13 +1,18 @@
-import { Button, Container, Divider, Stack, TextField } from "@mui/material";
-import { PostEditor } from "@/features/posts/components/editor/PostEditor";
-import type { PostEditorHandle } from "@/features/posts/components/editor/PostEditorTypes";
-import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { usePost } from "@/features/posts/hooks/usePost";
-import { PostStatus } from "@/features/posts/types/post";
+import { useNavigate, useParams } from "react-router-dom";
+import { Box, Button, Container, Divider, Stack, TextField } from "@mui/material";
+import { CheckCircleOutlineRounded, DriveFileRenameOutlineRounded, VisibilityOutlined } from "@mui/icons-material";
+
+import { PostEditor } from "@/features/posts/components/editor/PostEditor";
 import PostPublishModal from "@/features/posts/components/PostPublishModal";
+
+import { usePost } from "@/features/posts/hooks/usePost";
 import { useUpdatePost } from "@/features/posts/hooks/useUpdatePost";
+import { usePostPreview } from "@/features/posts/hooks/usePostPreview";
 import { useAlert } from "@/shared/hooks/useAlert";
+
+import { PostStatus } from "@/features/posts/types/post";
+import type { PostEditorHandle } from "@/features/posts/components/editor/PostEditorTypes";
 
 export interface PublishDataState {
   slug: string;
@@ -16,28 +21,26 @@ export interface PublishDataState {
   status: PostStatus;
 }
 
+const IFRAME_SITE_URL = 'https://www.pyomin.com';
+
 export default function PostEditPage() {
 
   const navigate = useNavigate();
-
   const { showAlert } = useAlert();
-
   const { postId } = useParams() as { postId: string };
 
   const editorRef = useRef<PostEditorHandle>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
-
   const [title, setTitle] = useState("");
-  const [publishData, setPublishData] = useState({
-    slug: "",
-    description: "",
-    categoryId: 0,
-    status: PostStatus.DRAFT as PostStatus,
+  const [publishData, setPublishData] = useState<PublishDataState>({
+    slug: "", description: "", categoryId: 0, status: PostStatus.DRAFT as PostStatus,
   });
 
   const { data: post, isPending: isLoading } = usePost(postId);
+  const { mutate: updatePost, isPending: isUpdating } = useUpdatePost();
+  const { sendPreviewData } = usePostPreview(IFRAME_SITE_URL, iframeRef, isPreviewOpen, title, post, editorRef);
 
   useEffect(() => {
     if (post) {
@@ -46,28 +49,21 @@ export default function PostEditPage() {
         setPublishData({
           slug: post.publishInfo.slug || "",
           description: post.publishInfo.description || "",
-          categoryId: post.publishInfo.categoryId || 0,
+          categoryId: post.publishInfo.category.id || 0,
           status: post.publishInfo.status || PostStatus.DRAFT,
         })
       }
     }
   }, [post]);
 
+  const getPayload = () => {
+    const { html, json } = editorRef.current?.getContent() || { html: '', json: '' };
+    return { title, content: html, contentJson: json, description: publishData.description, categoryId: publishData.categoryId }
+  }
+
   const handlePublishDataChange = <K extends keyof PublishDataState>(key: K, value: PublishDataState[K]) => {
     setPublishData(prev => ({ ...prev, [key]: value }));
   };
-
-  const getPayload = () => {
-    const { html, json } = editorRef.current?.getContent() || { html: '', json: '' }
-
-    return {
-      title,
-      content: html,
-      contentJson: json,
-      description: publishData.description,
-      categoryId: publishData.categoryId,
-    }
-  }
 
   const handleDraftSave = () => {
     const payload = getPayload();
@@ -171,29 +167,70 @@ export default function PostEditPage() {
 
         <Divider sx={{ my: 2 }} />
 
-        <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ pb: 10 }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="large"
-            onClick={handleDraftSave}
-            disabled={isUpdating}
-          >
-            임시 저장
-          </Button>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ pb: 10 }}>
           <Button
             variant="contained"
-            disableElevation
+            color="info"
             size="large"
-            onClick={() => setIsModalOpen(true)}
-            disabled={isUpdating}
+            startIcon={<VisibilityOutlined />}
+            onClick={() => setIsPreviewOpen(true)}
           >
-            작성 완료
+            미리 보기
           </Button>
+
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="large"
+              startIcon={<DriveFileRenameOutlineRounded />}
+              onClick={handleDraftSave}
+              disabled={isUpdating}
+            >
+              임시 저장
+            </Button>
+            <Button
+              variant="contained"
+              disableElevation
+              size="large"
+              startIcon={<CheckCircleOutlineRounded />}
+              onClick={() => setIsModalOpen(true)}
+              disabled={isUpdating}
+            >
+              작성 완료
+            </Button>
+          </Stack>
         </Stack>
 
       </Stack>
 
+      {/* 미리보기 iframe */}
+      {isPreviewOpen && (
+        <Box
+          sx={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            bgcolor: 'background.paper', zIndex: 9999, display: 'flex', flexDirection: 'column'
+          }}
+        >
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>실시간 미리보기</Box>
+            <Button variant="contained" color="error" size="small" onClick={() => setIsPreviewOpen(false)}>
+              미리보기 닫기
+            </Button>
+          </Stack>
+
+          <Box sx={{ flexGrow: 1, position: 'relative', bgcolor: '#f5f5f5' }}>
+            <iframe
+              ref={iframeRef}
+              src={`${IFRAME_SITE_URL}/posts/preview`}
+              style={{ width: '100%', height: '100%', border: 'none', backgroundColor: 'transparent' }}
+              onLoad={sendPreviewData}
+            />
+          </Box>
+        </Box>
+      )}
+
+      {/* 공개 설정 모달 */}
       <PostPublishModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
