@@ -1,4 +1,6 @@
+import { forwardRef } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
@@ -6,27 +8,28 @@ import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { TRANSFORMERS } from '@lexical/markdown';
 
 import { Box, Divider, Paper } from '@mui/material';
-import { forwardRef } from 'react';
-import type { PostEditorHandle, PostEditorProps } from '@/features/posts/components/editor/PostEditorTypes';
-import PostEditorTheme from '@/features/posts/components/editor/themes/PostEditorTheme';
-import { PlaceholderText, StyledEditable } from '@/features/posts/components/editor/ui/PostEditorStyledComponents';
+
+import CodeHighlightPlugin from '@/features/posts/components/editor/plugins/CodeHighlightPlugin';
 import PostEditorStatePlugin from '@/features/posts/components/editor/plugins/EditorStatePlugin';
-import { PostEditorNodes } from '@/features/posts/components/editor/nodes';
-import ImageToolbar from '@/features/posts/components/editor/toolbar/ImageToolbar';
 import ImagesPlugin from '@/features/posts/components/editor/plugins/ImagePlugin';
+
+import HistoryToolbar from '@/features/posts/components/editor/toolbar/HistoryToolbar';
 import HeadingToolbar from '@/features/posts/components/editor/toolbar/HeadingToolbar';
-import CodeHighlightPlugin from '@/features/posts/components/editor/toolbar/CodeBlockToolbar';
-import CodeLanguageToolbar from '@/features/posts/components/editor/toolbar/CodeLanguageToolbar';
 import TextFormatToolbar from '@/features/posts/components/editor/toolbar/TextFormatToolbar';
 import CodeBlockToolbar from '@/features/posts/components/editor/toolbar/CodeBlockToolbar';
 import LinkToolbar from '@/features/posts/components/editor/toolbar/LinkToolbar';
 import InsertRuleToolbar from '@/features/posts/components/editor/toolbar/InsertRuleToolbar';
+import ImageToolbar from '@/features/posts/components/editor/toolbar/ImageToolbar';
 import AlignmentToolbar from '@/features/posts/components/editor/toolbar/AlignmentToolbar';
-import HistoryToolbar from '@/features/posts/components/editor/toolbar/HistoryToolbar';
+import CodeLanguageToolbar from '@/features/posts/components/editor/toolbar/CodeLanguageToolbar';
+
+import type { PostEditorHandle, PostEditorProps } from '@/features/posts/components/editor/PostEditorTypes';
+import PostEditorTheme from '@/features/posts/components/editor/themes/PostEditorTheme';
+import { PostEditorNodes } from '@/features/posts/components/editor/nodes';
+import { PlaceholderText, StyledEditable } from '@/features/posts/components/editor/ui/PostEditorStyledComponents';
 
 const editorConfig = {
   namespace: 'BlueCoolEditor',
