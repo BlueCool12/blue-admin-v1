@@ -1,9 +1,13 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Select, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import type { PublishDataState } from "@/features/posts/pages/PostEditPage";
-import { PostStatus } from "@/features/posts/types/post";
-import { useCategories } from "@/features/categories/hooks/useCategories";
+import { AppRegistrationOutlined } from "@mui/icons-material";
+
 import { useMemo } from "react";
+
+import { useCategories } from "@/features/categories/hooks/useCategories";
 import { flattenCategories } from "@/features/categories/utils/category.utils";
+import { PostStatus } from "@/features/posts/types/post";
+
+import type { PublishDataState } from "@/features/posts/pages/PostEditPage";
 
 interface PostPublishModalProps {
   open: boolean;
@@ -23,7 +27,17 @@ export default function PostPublishModal({ open, onClose, data, onChange, onConf
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontWeight: 700, pt: 3 }}>포스팅 설정</DialogTitle>
+      <DialogTitle
+        sx={{
+          fontWeight: 700,
+          pt: 3,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
+        <AppRegistrationOutlined sx={{ fontSize: '1.2rem' }} />
+        포스팅 설정
+      </DialogTitle>
 
       <DialogContent>
         <Stack spacing={4} sx={{ mt: 1 }}>
@@ -127,20 +141,21 @@ export default function PostPublishModal({ open, onClose, data, onChange, onConf
 
       <DialogActions sx={{ p: 3, pt: 1 }}>
         <Button
-          onClick={onClose}
+          variant="outlined"
           size="large"
-          color="inherit"
+          color="info"
           sx={{ px: 4 }}
+          onClick={onClose}
         >
           취소
         </Button>
 
         <Button
           variant="contained"
-          onClick={onConfirm}
           size="large"
           disableElevation
           sx={{ px: 4 }}
+          onClick={onConfirm}
         >
           완료
         </Button>
