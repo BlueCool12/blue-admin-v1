@@ -5,5 +5,6 @@ export interface AuthUser {
   loginId: string;
   name: string;
   nickname: string;
+  profileImageUrl: string | null;
   role: UserRole;
 }

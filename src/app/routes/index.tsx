@@ -8,6 +8,7 @@ import PostListPage from "@/features/posts/pages/PostListPage";
 import CategoryListPage from "@/features/categories/pages/CategoryListPage";
 import CommentListPage from "@/features/comments/pages/CommentListPage";
 import UserListPage from "@/features/users/pages/UserListPage";
+import SettingsPage from "@/features/users/pages/SettingsPage";
 
 export const router = createBrowserRouter([
     // 로그인
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
                         children: [
                             { index: true, element: <UserListPage /> }
                         ]
+                    },
+                    {
+                        path: "settings",
+                        element: <SettingsPage />
                     }
                 ],
             },

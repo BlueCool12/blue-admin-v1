@@ -15,13 +15,14 @@ interface HeaderProps {
 export function Header({ onDrawerToggle }: HeaderProps) {
 
   const location = useLocation();
-  const pathnames = location.pathname.split('/').filter((x) => x);  
+  const pathnames = location.pathname.split('/').filter((x) => x);
 
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
   const breadcrumbNameMap: Record<string, string> = {
     dashboard: '대시보드',
+    settings: '설정',
     posts: '글 관리',
     edit: '글 작성',
     categories: '카테고리 관리',
@@ -36,7 +37,7 @@ export function Header({ onDrawerToggle }: HeaderProps) {
   const handleConfirmLogout = () => {
     logout(undefined, {
       onSettled: () => {
-        setIsLogoutConfirmOpen(false);        
+        setIsLogoutConfirmOpen(false);
       }
     });
   };
