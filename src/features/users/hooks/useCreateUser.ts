@@ -1,4 +1,4 @@
-import type { UserRole } from "@/features/auth/types/user";
+import type { UserRole } from "@/features/auth/types/auth-user";
 import { http } from "@/shared/api/http";
 import { useAlert } from "@/shared/hooks/useAlert";
 import type { NestErrorResponse } from "@/shared/types/api";

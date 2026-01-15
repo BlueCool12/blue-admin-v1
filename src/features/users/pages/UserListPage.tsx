@@ -1,32 +1,18 @@
-import { EditRounded, LockRounded, PersonAddRounded } from "@mui/icons-material";
-import { Box, Button, Chip, Container, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material";
+import { EditRounded, LockRounded, PersonAddRounded, SearchRounded } from "@mui/icons-material";
+import { Box, Button, Chip, CircularProgress, Container, IconButton, InputAdornment, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 import { UserCreateModal } from "../components/UserCreateModal";
-
-const mockAdmins = [
-  {
-    id: 1,
-    login_id: 'admin_cool',
-    name: '김철수',
-    nickname: '블루마스터',
-    role: 'ADMIN',
-    last_login_at: '2024-03-25 14:20:00',
-    locked_until: null
-  },
-  {
-    id: 2,
-    login_id: 'editor_01',
-    name: '이영희',
-    nickname: '에디터K',
-    role: 'USER',
-    last_login_at: '2024-03-24 09:15:00',
-    locked_until: '2026-12-31 23:59:59'
-  },
-];
+import { useUsers } from "../hooks/useUsers";
 
 export default function UserListPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState('');
+
+  const { data, isLoading, isError } = useUsers({ page, limit, search });
 
   const isLocked = (lockedUntil: string | null) => {
     if (!lockedUntil) return false;
@@ -42,7 +28,7 @@ export default function UserListPage() {
             flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: 1
+            gap: { xs: 2, sm: 1 }
           }}
         >
           <Box>
@@ -56,11 +42,36 @@ export default function UserListPage() {
 
           <Button
             variant="contained"
+            sx={{
+              width: { xs: '100%', sm: 'auto' }
+            }}
             startIcon={<PersonAddRounded />}
             onClick={() => setIsModalOpen(true)}
           >
             계정 추가
           </Button>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <TextField
+            size="small"
+            placeholder="아이디, 이름, 닉네임 검색"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1);
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchRounded sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  </InputAdornment>
+                )
+              }
+            }}
+            sx={{ width: { xs: '100%', sm: 300 } }}
+          />
         </Box>
 
         <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
@@ -76,50 +87,82 @@ export default function UserListPage() {
             </TableHead>
 
             <TableBody>
-              {mockAdmins.map((admin) => (
-                <TableRow key={admin.id} hover>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {admin.name}
-                          {isLocked(admin.locked_until) && (
-                            <Tooltip title="계정 잠금 상태">
-                              <LockRounded color="error" sx={{ fontSize: 16, ml: 0.5, verticalAlign: 'middle' }} />
-                            </Tooltip>
-                          )}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {admin.login_id}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </TableCell>
-
-                  <TableCell>{admin.nickname}</TableCell>
-
-                  <TableCell>
-                    <Chip
-                      label={admin.role}
-                      size="small"
-                      color={admin.role === 'ADMIN' ? 'primary' : 'default'}
-                      variant={admin.role === 'ADMIN' ? 'filled' : 'outlined'}
-                    />
-                  </TableCell>
-
-                  <TableCell sx={{ typography: 'body2', color: 'text.secondary' }}>
-                    {admin.last_login_at || '기록 없음'}
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <IconButton size="small">
-                      <EditRounded fontSize="small" />
-                    </IconButton>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
+                    <CircularProgress size={24} />
+                    <Typography variant="body2" sx={{ mt: 1 }}>데이터를 불러오는 중...</Typography>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 10, color: 'error.main' }}>
+                    데이터를 불러오는 데 실패했습니다.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                data?.items.map((user) => (
+                  <TableRow key={user.id} hover>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {user.name}
+                            {isLocked(user.lockedUntil) && (
+                              <Tooltip title="계정 잠금 상태">
+                                <LockRounded color="error" sx={{ fontSize: 16, ml: 0.5, verticalAlign: 'middle' }} />
+                              </Tooltip>
+                            )}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {user.loginId}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
+
+                    <TableCell>{user.nickname}</TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={user.role}
+                        size="small"
+                        color={user.role === 'ADMIN' ? 'primary' : 'default'}
+                        variant={user.role === 'ADMIN' ? 'filled' : 'outlined'}
+                      />
+                    </TableCell>
+
+                    <TableCell sx={{ typography: 'body2', color: 'text.secondary' }}>
+                      {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : '기록 없음'}
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <IconButton size="small">
+                        <EditRounded fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
+
+
+          <TablePagination
+            component="div"
+            count={data?.total ?? 0}
+            page={page - 1}
+            onPageChange={(_, newPage) => setPage(newPage + 1)}
+            rowsPerPage={limit}
+            onRowsPerPageChange={(e) => {
+              setLimit(parseInt(e.target.value, 10));
+              setPage(1);
+            }}
+            labelRowsPerPage="페이지당 행 수:"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} / 전체 ${count !== -1 ? count : `${to}개 이상`}`
+            }
+          />
         </TableContainer>
       </Stack>
 

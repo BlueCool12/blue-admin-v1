@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import type { UserRole } from "@/features/auth/types/user";
+import type { UserRole } from "@/features/auth/types/auth-user";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField } from "@mui/material";
 import { useCreateUser, type CreateUserPayload } from "../hooks/useCreateUser";
 
