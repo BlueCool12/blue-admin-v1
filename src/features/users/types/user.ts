@@ -6,4 +6,6 @@ export interface User {
   name: string;
   nickname: string;
   role: UserRole;
+  lastLoginAt: string | null;
+  lockedUntil: string | null;
 }

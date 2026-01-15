@@ -44,7 +44,7 @@ export default function CommentListPage() {
   return (
     <Container maxWidth="lg" disableGutters>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" fontWeight={800} gutterBottom>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
           전체 게시글에 등록된 댓글을 확인하고 관리합니다.
         </Typography>
         <Typography variant="body2" color="text.secondary">
