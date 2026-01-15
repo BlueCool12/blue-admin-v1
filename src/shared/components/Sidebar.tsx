@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
-import { AddRounded, CategoryRounded, CommentRounded, DashboardRounded, DescriptionRounded, ForumRounded, SettingsRounded } from "@mui/icons-material";
+import { AddRounded, CategoryRounded, CommentRounded, DashboardRounded, DescriptionRounded, ForumRounded, PeopleAltRounded, SettingsRounded } from "@mui/icons-material";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useCreateDraft } from "@/features/posts/hooks/useCreateDraft";
 
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { text: '글 관리', icon: <DescriptionRounded />, path: '/posts' },
   { text: '카테고리 관리', icon: <CategoryRounded />, path: '/categories' },
   { text: '댓글 관리', icon: <CommentRounded />, path: '/comments' },
+  { text: '계정 관리', icon: <PeopleAltRounded />, path: '/users' },
   { text: '방명록 관리', icon: <ForumRounded />, path: 'https://github.com/BlueCool12/blue/issues/1', isExternal: true },
   { text: '설정', icon: <SettingsRounded />, path: '/settings' },
 ];

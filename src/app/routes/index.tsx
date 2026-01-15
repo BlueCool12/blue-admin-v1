@@ -7,6 +7,7 @@ import Login from "@/features/auth/pages/Login";
 import PostListPage from "@/features/posts/pages/PostListPage";
 import CategoryListPage from "@/features/categories/pages/CategoryListPage";
 import CommentListPage from "@/features/comments/pages/CommentListPage";
+import UserListPage from "@/features/users/pages/UserListPage";
 
 export const router = createBrowserRouter([
     // 로그인
@@ -42,6 +43,12 @@ export const router = createBrowserRouter([
                         path: "comments",
                         children: [
                             { index: true, element: <CommentListPage /> }
+                        ]
+                    },
+                    {
+                        path: "users",
+                        children: [
+                            { index: true, element: <UserListPage /> }
                         ]
                     }
                 ],

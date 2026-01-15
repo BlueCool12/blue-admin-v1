@@ -26,6 +26,7 @@ export function Header({ onDrawerToggle }: HeaderProps) {
     edit: '글 작성',
     categories: '카테고리 관리',
     comments: '댓글 관리',
+    users: '계정 관리',
   };
 
   const handleLogoutClick = () => {
