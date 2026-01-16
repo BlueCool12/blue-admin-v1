@@ -5,7 +5,7 @@ import { RootLayout } from "@/app/layouts/RootLayout";
 import { Loading } from "@/shared/components/Loading";
 
 const Login = lazy(() => import("@/features/auth/pages/Login"));
-const Dashboard = lazy(() => import("@/features/dashboard/pages/DashboardPage"));
+const DashboardPage = lazy(() => import("@/features/dashboard/pages/DashboardPage"));
 const PostListPage = lazy(() => import("@/features/posts/pages/PostListPage"));
 const PostEditPage = lazy(() => import("@/features/posts/pages/PostEditPage"));
 const CategoryListPage = lazy(() => import("@/features/categories/pages/CategoryListPage"));
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
         element: <RootLayout />,
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <Dashboard /> },
+          { path: "dashboard", element: <DashboardPage /> },
           {
             path: "posts",
             children: [
