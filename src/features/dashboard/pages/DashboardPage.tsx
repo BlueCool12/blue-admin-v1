@@ -1,41 +1,39 @@
 import { ChevronRightRounded, CommentRounded, DescriptionRounded, PeopleAltRounded, TrendingUpRounded } from "@mui/icons-material";
-import { alpha, Box, Container, Grid, IconButton, Paper, Stack, Tooltip, Typography, useTheme } from "@mui/material";
+import { alpha, Box, Container, Grid, IconButton, List, ListItem, ListItemButton, ListItemText, Paper, Stack, Tooltip, Typography, useTheme } from "@mui/material";
 import { LineChart } from '@mui/x-charts/LineChart';
 import { useNavigate } from "react-router-dom";
-import { SummaryCard } from "../components/SummaryCard";
-
-const dailyData = [
-    { day: '01/10', pv: 400, uv: 120 },
-    { day: '01/11', pv: 300, uv: 110 },
-    { day: '01/12', pv: 200, uv: 90 },
-    { day: '01/13', pv: 278, uv: 130 },
-    { day: '01/14', pv: 189, uv: 115 },
-    { day: '01/15', pv: 239, uv: 145 },
-    { day: '01/16', pv: 349, uv: 160 },
-];
+import { SummaryCard } from "@/features/dashboard/components/SummaryCard";
+import { useDashboardStats } from "@/features/dashboard/hooks/useDashboardStats";
 
 export default function DashboardPage() {
     const navigate = useNavigate();
-
     const theme = useTheme();
 
+    const { data, isLoading, error } = useDashboardStats();
+
+    if (isLoading) return <div>로딩 중...</div>;
+    if (error) return <div>에러가 발생했습니다.</div>;
+    if (!data) return null;
+
+    const { summary, trend, recentComments, weeklyTopPosts } = data;
+
     return (
-        <Container maxWidth="lg" sx={{ py: 3 }} disableGutters>
+        <Container maxWidth="lg" sx={{ py: 4 }} disableGutters>
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <SummaryCard title="오늘 방문자 (UV)" value="124" icon={<PeopleAltRounded />} />
+                    <SummaryCard title="오늘 방문자 (UV)" value={summary.todayUv.toLocaleString()} icon={<PeopleAltRounded />} />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <SummaryCard title="오늘 페이지뷰 (PV)" value="452" icon={<TrendingUpRounded />} />
+                    <SummaryCard title="오늘 페이지뷰 (PV)" value={summary.todayPv.toLocaleString()} icon={<TrendingUpRounded />} />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <SummaryCard title="대기 중인 댓글" value="8" icon={<CommentRounded />} />
+                    <SummaryCard title="대기 중인 댓글" value={summary.pendingComments.toLocaleString()} icon={<CommentRounded />} />
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <SummaryCard title="전체 게시글" value="1,024" icon={<DescriptionRounded />} />
+                    <SummaryCard title="전체 게시글" value={summary.totalPosts.toLocaleString()} icon={<DescriptionRounded />} />
                 </Grid>
 
                 <Grid size={{ xs: 12, lg: 8 }}>
@@ -57,23 +55,11 @@ export default function DashboardPage() {
 
                         <Box sx={{ height: 300, width: '100%' }}>
                             <LineChart
-                                dataset={dailyData}
-                                xAxis={[{
-                                    scaleType: 'point',
-                                    dataKey: 'day',
-                                    valueFormatter: (value) => value.toString()
-                                }]}
+                                dataset={trend}
+                                xAxis={[{ scaleType: 'point', dataKey: 'day' }]}
                                 series={[
-                                    {
-                                        dataKey: 'pv',
-                                        color: alpha(theme.palette.primary.main, 0.2),
-                                        area: true,
-                                        showMark: false,
-                                    },
-                                    {
-                                        dataKey: 'uv',
-                                        color: theme.palette.primary.main,
-                                    },
+                                    { dataKey: 'pv', label: '페이지뷰', area: true, color: alpha(theme.palette.primary.main, 0.2) },
+                                    { dataKey: 'uv', label: '방문자', color: theme.palette.primary.main },
                                 ]}
                                 slotProps={{
                                     legend: {
@@ -99,11 +85,11 @@ export default function DashboardPage() {
                         </Box>
 
                         <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
-                            {[1, 2, 3].map((i) => (
-                                <Box key={i} sx={{ mb: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>작성자 {i}</Typography>
+                            {recentComments.map((comment) => (
+                                <Box key={comment.id} sx={{ mb: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 2 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{comment.nickname}</Typography>
                                     <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
-                                        댓글 내용이 여기에 표시됩니다. 길어지면 생략...
+                                        {comment.content}
                                     </Typography>
                                 </Box>
                             ))}
@@ -113,8 +99,8 @@ export default function DashboardPage() {
 
                 <Grid size={{ xs: 12 }}>
                     <Paper sx={{ p: 3, borderRadius: 3 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>가장 많이 본 콘텐츠</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>🔥 인기 게시글 (Top 3)</Typography>
 
                             <Tooltip title="글 관리" arrow>
                                 <IconButton onClick={() => navigate('/posts')} size="small">
@@ -123,32 +109,18 @@ export default function DashboardPage() {
                             </Tooltip>
                         </Box>
 
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {[
-                                { title: 'React에서 Lazy Loading 적용하기', url: '/posts/1', views: 842 },
-                                { title: 'MUI v6 Grid 시스템 완벽 가이드', url: '/posts/2', views: 651 },
-                                { title: 'Clean Architecture를 향한 여정', url: '/posts/3', views: 432 },
-                            ].map((post, idx) => (
-                                <Box key={idx} sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    p: 2,
-                                    borderRadius: 2,
-                                    border: '1px solid',
-                                    borderColor: 'divider',
-                                    '&:hover': { bgcolor: 'action.hover' }
-                                }}>
-                                    <Box>
-                                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.title}</Typography>
-                                        <Typography variant="caption" color="text.secondary">{post.url}</Typography>
-                                    </Box>
-                                    <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
-                                        {post.views.toLocaleString()} PV
-                                    </Typography>
-                                </Box>
+                        <List>
+                            {weeklyTopPosts.map((post, index) => (
+                                <ListItem key={post.id} disablePadding>
+                                    <ListItemButton LinkComponent="a" href={`/posts/${post.id}/edit`}>
+                                        <ListItemText
+                                            primary={`${index + 1}. ${post.title}`}
+                                            secondary={`조회수: ${post.viewCount}회`}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
                             ))}
-                        </Box>
+                        </List>
                     </Paper>
                 </Grid>
             </Grid>
