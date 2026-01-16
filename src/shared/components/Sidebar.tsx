@@ -24,8 +24,15 @@ export function Sidebar() {
   const CMS_VERSION = "v1.0.0";
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      scrollbarGutter: 'stable'
+    }}>
+      <Box sx={{ width: '100%' }}>
         <Box
           component={RouterLink}
           to="/"
