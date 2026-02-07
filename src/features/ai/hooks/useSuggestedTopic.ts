@@ -1,11 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
-import { getSuggestedTopic } from '../api';
-import { AI_KEYS } from '../keys';
+import { http } from '@/shared/api/http';
+import { AI_KEYS } from '@/features/ai/hooks/keys';
+
+export interface SuggestedTopic {
+  category: string;
+  topic: string;
+}
 
 export function useSuggestedTopic() {
   return useQuery({
-    queryKey: AI_KEYS.suggestion(),
-    queryFn: getSuggestedTopic,
+    queryKey: AI_KEYS.topic(),
+    queryFn: async () => {
+      const { data } = await http.get<SuggestedTopic>('/posts/suggest/topic');
+      return data;
+    },
     enabled: false,
   });
 }
